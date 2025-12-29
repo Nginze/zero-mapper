@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from 'axios';
 import * as cheerio from 'cheerio';
-import { KwikExtractor } from '../utils/kwik-extractor';
+import { KwikExtractor } from '../utils/kwik-extractor.js';
 
 interface SearchResultItem {
   id: string;

@@ -540,7 +540,11 @@ export async function fetchEpisodesData(
             players: {},
           };
         }
-        episodeData[index].players[`Player ${playerNumber}`] = embedUrl;
+        // Convert vidmoly.to to vidmoly.net
+        const processedUrl = embedUrl.includes('vidmoly') 
+          ? embedUrl.replace('vidmoly.to', 'vidmoly.net')
+          : embedUrl;
+        episodeData[index].players[`Player ${playerNumber}`] = processedUrl;
       });
     }
 

@@ -36,13 +36,10 @@ RUN npx playwright install chromium
 # Copy source code
 COPY . .
 
-# Build TypeScript
-RUN pnpm build
-
 # Environment variables
 ENV MONGODB_URI=mongodb://kaizoku:guuk12jona@46.224.117.251:27017/anidb?authSource=admin
 ENV CONCURRENCY=10
 ENV SKIP_EXISTING=false
 
-# Run the populate script
-CMD ["node", "dist/scripts/populate-mappings.js"]
+# Run the populate script using tsx
+CMD ["npx", "tsx", "scripts/populate-mappings.ts"]

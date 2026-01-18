@@ -23,7 +23,7 @@ interface AniListAnimeInfo {
   id: number;
   title: AniListTitle;
   description: string | null;
-  coverImage: AniListCoverImage;
+  coverImage: AniListCoverImage
   bannerImage: string | null;
   episodes: number | null;
   status: string | null;

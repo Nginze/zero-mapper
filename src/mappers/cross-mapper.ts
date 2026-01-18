@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { getEpisodesForAnime } from '../providers/animesama.js';
+import { safeRequest } from '../utils/safe-request.js';
 
 
 interface AniListTitle {
@@ -303,7 +303,7 @@ export class AnimeMapper {
     `;
 
     try {
-      const response = await axios.post(this.anilistUrl, {
+      const response = await safeRequest.post(this.anilistUrl, {
         query,
         variables: { id }
       });
@@ -323,7 +323,7 @@ export class AnimeMapper {
     if (cached) return cached;
 
     try {
-      const response = await axios.get(
+      const response = await safeRequest.get(
         `${this.malBaseUrl}/anime/${id}?fields=id,title,alternative_titles,start_date,end_date,synopsis,mean,num_episodes,status,genres,media_type`,
         { headers: { 'X-MAL-CLIENT-ID': this.malClientId } }
       );
@@ -340,15 +340,15 @@ export class AnimeMapper {
     if (cached) return cached;
 
     try {
-      const response = await axios.get(
+      const response = await safeRequest.get(
         `${this.tmdbBaseUrl}/${mediaType}/${id}?api_key=${this.tmdbApiKey}&language=en-US`
       );
       const data = response.data;
-      
+
       if (mediaType === 'tv' && data.number_of_seasons) {
         data.seasons = await this.getTMDBSeasons(id);
       }
-      
+
       this.setCache(cacheKey, data);
       return data;
     } catch {
@@ -362,7 +362,7 @@ export class AnimeMapper {
     if (cached) return cached;
 
     try {
-      const response = await axios.get(
+      const response = await safeRequest.get(
         `${this.tmdbBaseUrl}/tv/${tvId}?api_key=${this.tmdbApiKey}&language=en-US`
       );
       const seasons = response.data.seasons?.filter((s: TMDBSeason) => s.season_number > 0) || [];
@@ -400,7 +400,7 @@ export class AnimeMapper {
     `;
 
     try {
-      const response = await axios.post(this.anilistUrl, {
+      const response = await safeRequest.post(this.anilistUrl, {
         query: gqlQuery,
         variables: { search: query }
       });
@@ -420,7 +420,7 @@ export class AnimeMapper {
     if (cached) return cached;
 
     try {
-      const response = await axios.get(
+      const response = await safeRequest.get(
         `${this.malBaseUrl}/anime?q=${encodeURIComponent(query)}&limit=${limit}&fields=id,title,alternative_titles,start_date,num_episodes,media_type,mean,status`,
         { headers: { 'X-MAL-CLIENT-ID': this.malClientId } }
       );
@@ -438,7 +438,7 @@ export class AnimeMapper {
     if (cached) return cached;
 
     try {
-      const response = await axios.get(
+      const response = await safeRequest.get(
         `${this.tmdbBaseUrl}/search/${mediaType}?api_key=${this.tmdbApiKey}&query=${encodeURIComponent(query)}&language=en-US`
       );
       const data = response.data.results;
@@ -1312,12 +1312,12 @@ export class AnimeMapper {
 
   private async fetchAnimePaheData(anilistId: string | number): Promise<MappingResult['animepahe'] | null> {
     try {
-      const response = await axios.get(`http://localhost:3000/animepahe/map/${anilistId}`, {
+      const response = await safeRequest.get(`http://localhost:3000/animepahe/map/${anilistId}`, {
         timeout: 5000,
         validateStatus: (status) => status === 200
       });
       const data = response.data;
-      
+
       if (data.animepahe) {
         return {
           id: data.animepahe.id,
@@ -1333,12 +1333,12 @@ export class AnimeMapper {
 
   private async fetchHiAnimeData(anilistId: string | number): Promise<MappingResult['hianime'] | null> {
     try {
-      const response = await axios.get(`http://localhost:3000/hianime/${anilistId}`, {
+      const response = await safeRequest.get(`http://localhost:3000/hianime/${anilistId}`, {
         timeout: 5000,
         validateStatus: (status) => status === 200
       });
       const data = response.data;
-      
+
       if (data.hianimeId) {
         return {
           id: data.hianimeId,
@@ -1354,17 +1354,17 @@ export class AnimeMapper {
 
   private async fetchAnimeKaiData(anilistId: string | number): Promise<MappingResult['animekai'] | null> {
     try {
-      const response = await axios.get(`http://localhost:3000/animekai/map/${anilistId}`, {
+      const response = await safeRequest.get(`http://localhost:3000/animekai/map/${anilistId}`, {
         timeout: 5000,
         validateStatus: (status) => status === 200
       });
       const data = response.data;
-      
+
       if (data.animekai) {
         // Extract slug from URL (e.g., "https://anikai.to/watch/anime-slug" -> "anime-slug")
         const urlPath = data.animekai.id || data.animekai.url || '';
         const slug = urlPath.split('/watch/')[1] || urlPath.split('/').pop() || urlPath;
-        
+
         return {
           id: slug,
           url: data.animekai.url,
